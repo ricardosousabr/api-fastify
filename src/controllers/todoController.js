@@ -1,4 +1,4 @@
-const task = [
+let task = [
   {
     id: 1,
     name: "Fazer compras",
@@ -6,7 +6,7 @@ const task = [
   {
     id: 2,
     name: "Ler um livro",
-  }
+  },
 ]
 
 const allTasks = (req, res) => {
@@ -14,16 +14,18 @@ const allTasks = (req, res) => {
 }
 
 const createTask = (req, res) => {
-  const newId = Object.keys(task).length + 1;
+  console.log(req.body);
+  const newId = task.length++;
   const { name } = req.body;
-    const newTask = { id: newId, name };
-    res.status(201).json(newTask);
+  const newTask = { id: newId, name };
+  task[newId] = newTask
+  res.json(newTask);
 }
 
 const deleteTask = (req, res) => {
   const { id } = req.params
-  const index = task.findIndex(todo => todo.id === parseInt(id));
-  task.splice(index, 1)
+  let filterTask = task.filter(todo => todo.id != id)
+  task = filterTask
   res.json({ message: 'To-do removido com sucesso' });
 }
 
