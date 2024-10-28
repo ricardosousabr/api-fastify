@@ -1,21 +1,15 @@
 const express = require('express')
 const routerMain = express.Router()
-// const task = ["Fazer compras"]
-const {allTasks, deleteTask, createTask} = require('../controllers/todoController')
+const {allTasks, taskByID, createTask, updateTask, deleteTask} = require('../controllers/todoController')
 
-routerMain.post('/add-task', createTask)
+routerMain.post('/create', createTask)
 
 routerMain.get('/', allTasks)
 
-routerMain.get('/task', (req, res) => {
-  console.log("displays an task")
-})
+routerMain.get('/:id', taskByID)
+
+routerMain.put('/update/:id', updateTask)
 
 routerMain.delete('/delete/:id', deleteTask)
-
-routerMain.put('/update', (req, res) => {
-  console.log("update in task")
-})
-
 
 module.exports = routerMain
