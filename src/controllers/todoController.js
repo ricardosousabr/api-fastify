@@ -24,18 +24,19 @@ const createTask = (req, res) => {
     id: task.length + 1,
     name: req.body.name
   };
-  if(newTask.id) return res.status(200).json({msg: 'Task created'});
-  task.push(newTask);
-  res.json(newTask);
+  if(newTask.id) {
+    task.push(newTask);
+    return res.status(200).json({msg: 'Task created'})
+  }
 };
 
 const updateTask = (req, res) => {
   let {id} = req.params
+  if(!task[id-1]) return res.status(200).json({msg: 'Task not found'})
   let update = {
     id: id,
     name: req.body.name
   }
-  if(!id) return res.status(200).json({msg: 'Task not found'})
   task[id-1] = update
   res.json(update)
 }
@@ -49,3 +50,7 @@ const deleteTask = (req, res) => {
 }
 
 module.exports = {allTasks, taskByID, createTask, updateTask, deleteTask}
+
+//Conectar com o banco
+// Persitencia de dados (ele ficarem salvos)
+// validação de task vazia (PUT, POST)
