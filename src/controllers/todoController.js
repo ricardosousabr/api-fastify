@@ -42,14 +42,10 @@ const updateTask = (req, res) => {
 
 const deleteTask = (req, res) => {
   let { id } = req.params
-  if(!id) return res.status(200).json({msg: 'Task not found'})
   let filterTask = task.filter(todo => todo.id != id)
+  if(filterTask.length === task.length) return res.status(404).json({msg: 'Task not found'})
   task = filterTask
   res.json({ message: 'To-do removido com sucesso' })
 }
 
 module.exports = {allTasks, taskByID, createTask, updateTask, deleteTask}
-
-//Criar a rota put
-// adicionar as validações
-// Adicionar um banco de dados  e fazer a conexãoS
