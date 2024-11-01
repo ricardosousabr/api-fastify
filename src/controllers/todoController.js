@@ -1,56 +1,43 @@
-let task = [
-  {
-    id: 1,
-    name: "Fazer compras"
-  },
-  {
-    id: 2,
-    name: "Ler um livro"
-  }
-]
+const conection = require('../conection/conection')
+conection.connect()
 
 const allTasks = (_, res) => {
-  res.json(task);
+  conection.query('SELECT * FROM tasks', (err, rows, fields) => {
+    res.json(rows)
+  })
 }
 
 const taskByID = (req, res) => {
   let { id } = req.params;
-  if(!task[id-1]) return res.status(404).json({msg: 'Task not found'});
-  res.json(task[id-1])
+
+  conection.query('SELECT name FROM tasks WHERE id IN (?)', [id], (err, rows, fields) => {
+    res.json(rows)
+  })
 }
 
 const createTask = (req, res) => {
-  const newTask = {
-    id: task.length + 1,
-    name: req.body.name
-  };
-  if(newTask.id) {
-    task.push(newTask);
-    return res.status(200).json({msg: 'Task created'})
-  }
+  let task = req.body.name
+  conection.execute('INSERT INTO tasks (name) VALUES (?)', [task], (err, rows, fields) => {
+    res.status(200).json({msg: 'Task created successfully'})
+  })
+
 };
 
 const updateTask = (req, res) => {
   let {id} = req.params
-  if(!task[id-1]) return res.status(200).json({msg: 'Task not found'})
-  let update = {
-    id: id,
-    name: req.body.name
-  }
-  task[id-1] = update
-  res.json(update)
+  let task = req.body.name
+
+  conection.execute('UPDATE tasks SET name = ? WHERE id = ? ', [task, id], (err, rows, fields) => {
+    res.json(rows)
+  })
 }
 
 const deleteTask = (req, res) => {
   let { id } = req.params
-  let filterTask = task.filter(todo => todo.id != id)
-  if(filterTask.length === task.length) return res.status(404).json({msg: 'Task not found'})
-  task = filterTask
-  res.json({ message: 'To-do removido com sucesso' })
+
+  conection.execute('DELETE FROM tasks WHERE id = ?', [id], (err, rows, fields) => {
+    res.status(200).json({msg: 'Task deleted'})
+  })
 }
 
 module.exports = {allTasks, taskByID, createTask, updateTask, deleteTask}
-
-//Conectar com o banco
-// Persitencia de dados (ele ficarem salvos)
-// validação de task vazia (PUT, POST)
