@@ -1,13 +1,8 @@
+const mongoose = require('mongoose');
 require('dotenv').config();
 
-const mysql = require('mysql2');
+const mongoURI = process.env.MONGO_URI;
 
-const conection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME
-})
+const connectToMongoDB = () => mongoose.connect(mongoURI);
 
-
-module.exports = conection
+module.exports = connectToMongoDB
