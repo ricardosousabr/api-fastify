@@ -1,8 +1,6 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+const {MongoClient}  = require("mongodb");
+const connectionString = process.env.MONGO_URI || "";
+const client = new MongoClient(connectionString);
+let db = client.db("taskUser");
 
-const mongoURI = process.env.MONGO_URI;
-
-const connectToMongoDB = () => mongoose.connect(mongoURI);
-
-module.exports = connectToMongoDB
+module.exports = db;
