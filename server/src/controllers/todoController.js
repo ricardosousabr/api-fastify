@@ -1,43 +1,41 @@
-const conection = require('../conection/conection')
-conection.connect()
+const db = require('../conection/conection')
+const { ObjectId } = require('mongodb');
 
-const allTasks = (_, res) => {
-  conection.query('SELECT * FROM tasks', (err, rows, fields) => {
-    res.json(rows)
-  })
+const allTasks = async (_, res) => {
+  let collection = await db.collection("task")
+  let results = await collection.find({}, { projection: { name: 1, _id: 0 } }).toArray()
+  res.send(results).status(200)
 }
 
-const taskByID = (req, res) => {
+const taskByID = async (req, res) => {
   let { id } = req.params;
+  let collection = await db.collection("task")
+  let results = await collection.find({_id: new ObjectId(id)}, { projection: { name: 1, _id: 0 } }).toArray()
 
-  conection.query('SELECT name FROM tasks WHERE id IN (?)', [id], (err, rows, fields) => {
-    res.json(rows)
-  })
+  res.send(results).status(200)
 }
 
-const createTask = (req, res) => {
+const createTask = async (req, res) => {
   let task = req.body.name
-  conection.execute('INSERT INTO tasks (name) VALUES (?)', [task], (err, rows, fields) => {
-    res.status(200).json({msg: 'Task created successfully'})
-  })
-
+  let collection = await db.collection("task")
+  let result = collection.insertOne({name: task})
+  res.status(200).json({msg: 'Task created successfully'})
 };
 
-const updateTask = (req, res) => {
+const updateTask = async (req, res) => {
   let {id} = req.params
   let task = req.body.name
+  let collection = await db.collection("task")
+  let result = collection.updateOne({_id: new ObjectId(id)}, {$set: {name: task}})
+  res.status(200).json({msg: 'Task created successfully'})
 
-  conection.execute('UPDATE tasks SET name = ? WHERE id = ? ', [task, id], (err, rows, fields) => {
-    res.json(rows)
-  })
 }
 
-const deleteTask = (req, res) => {
+const deleteTask = async (req, res) => {
   let { id } = req.params
-
-  conection.execute('DELETE FROM tasks WHERE id = ?', [id], (err, rows, fields) => {
-    res.status(200).json({msg: 'Task deleted'})
-  })
+  let collection = await db.collection("task")
+  let result = await collection.deleteOne({_id: new ObjectId(id)});
+  res.status(200).json({msg: 'Task deleted'})
 }
 
-module.exports = {allTasks, taskByID, createTask, updateTask, deleteTask}
+ module.exports = {allTasks, taskByID, createTask, updateTask, deleteTask}

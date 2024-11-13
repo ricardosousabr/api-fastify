@@ -6,10 +6,10 @@ routerMain.post('/create', createTask)
 
 routerMain.get('/', allTasks)
 
-routerMain.get('/:id', taskByID)
+ routerMain.get('/:id', taskByID)
 
-routerMain.put('/update/:id', updateTask)
+ routerMain.put('/update/:id', updateTask)
 
 routerMain.delete('/delete/:id', deleteTask)
 
-module.exports = routerMain
+ module.exports = routerMain
