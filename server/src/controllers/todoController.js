@@ -11,7 +11,6 @@ const taskByID = async (req, res) => {
   let { id } = req.params;
   let collection = await db.collection("task")
   let results = await collection.find({_id: new ObjectId(id)}, { projection: { name: 1, _id: 0 } }).toArray()
-
   res.send(results).status(200)
 }
 
