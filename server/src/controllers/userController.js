@@ -1,9 +1,17 @@
 const db = require('../conection/conection')
 const { ObjectId } = require('mongodb');
+const Joi = require('joi');
+const schema = require('./validation/validetion');
 
 const getUser = async (req, res) => {
-  let {user} = req.body
+  let {user, pass} = req.body
   let collection = db.collection('user');
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   let result = await collection.findOne({userName: user});
   res.status(200).json(result)
 }
@@ -12,26 +20,25 @@ const createUser = (req, res) => {
   let {user, pass} = req.body;
   let collection = db.collection('user');
 
-  if (user != null && user != "" && pass != null && pass != "" ) {
-    let result = collection.insertOne({userName: user, password: pass});
-    res.status(200).json({msg: 'User created successfully'});
-  } else{
-    res.status(500).json({msg: 'the user cannot be null or empty'});
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
   }
+
+  let result = collection.insertOne({userName: user, password: pass});
+  res.status(200).json({msg: 'User created successfully'});
 }
 
 const updateUser = async (req, res) => {
   console.log("test")
   let {id} = req.params
-  let name = req.body
+  let {name, pass} = req.body
   let collection = await db.collection("user")
+  const { error, value } = schema.validate(req.body);
 
-
-  if (id != null && id != "" && name != null && name != "" ) {
-    let result = collection.updateOne({_id: new ObjectId(id)}, {$set: {userName: name}})
-    res.status(200).json({msg: 'User aupdate successfully'})
-    } else{
-    res.status(500).json({msg: 'the user cannot be null or empty'});
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
   }
 
   let result = collection.updateOne({_id: new ObjectId(id)}, {$set: {userName: name}})
