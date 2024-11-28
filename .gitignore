@@ -1,20 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/node,yarn,git
-# Edit at https://www.toptal.com/developers/gitignore?templates=node,yarn,git
-
-### Git ###
-# Created by git for backups. To disable backups in Git:
-# $ git config --global mergetool.keepBackup false
-*.orig
-
-# Created by git when using merge tools for conflicts
-*.BACKUP.*
-*.BASE.*
-*.LOCAL.*
-*.REMOTE.*
-*_BACKUP_*.txt
-*_BASE_*.txt
-*_LOCAL_*.txt
-*_REMOTE_*.txt
+# Created by https://www.toptal.com/developers/gitignore/api/node,yarn
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,yarn
 
 ### Node ###
 # Logs
@@ -173,4 +158,4 @@ dist
 # and uncomment the following lines
 # .pnp.*
 
-# End of https://www.toptal.com/developers/gitignore/api/node,yarn,git
+# End of https://www.toptal.com/developers/gitignore/api/node,yarn
