@@ -33,6 +33,23 @@ fastify.withTypeProvider<ZodTypeProvider>().route({
   },
 })
 
+fastify.withTypeProvider<ZodTypeProvider>().route({
+  method: 'GET',
+  url: '/user/:name',
+  // Define your schema
+  schema: {
+    params: z.object({
+      name: z.string().min(4),
+    }),
+    response: {
+      200: z.string(),
+    },
+  },
+  handler: (req, res) => {
+    res.send(req.params.name)
+  },
+})
+
 try {
   await fastify.listen({ port: Number(process.env.PORT) })
 } catch (err) {
