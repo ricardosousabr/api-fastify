@@ -1,6 +1,6 @@
 import Fastify, { FastifyInstance } from 'fastify'
 import dotenv from 'dotenv'
-import createUser from './routes/user/create'
+//import createUser from './routes/user/create'
 import {
   serializerCompiler,
   validatorCompiler,
@@ -13,7 +13,7 @@ const fastify: FastifyInstance = Fastify({
   logger: true,
 })
 
-fastify.register(createUser)
+//fastify.register(createUser)
 
 fastify.setValidatorCompiler(validatorCompiler)
 fastify.setSerializerCompiler(serializerCompiler)
