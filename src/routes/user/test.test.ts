@@ -1,13 +1,13 @@
-import Fastify from 'fastify'
+import fastify from 'fastify'
 import search from './search'
 import supertest from 'supertest'
 
 describe('User Route', () => {
-  let app: ReturnType<typeof Fastify>
+  let app: ReturnType<typeof fastify>
 
   beforeAll(async () => {
-    app = Fastify()
-    await app.register(search) // Registra a rota no servidor
+    app = fastify()
+    await app.register(search)
     await app.ready()
   })
 
