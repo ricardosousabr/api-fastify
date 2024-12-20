@@ -1,0 +1,20 @@
+name: pull-request
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  tests_yarn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+          cache-dependency-path: yarn.lock
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests
+        run: yarn test
