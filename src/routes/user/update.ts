@@ -14,7 +14,7 @@ const bodySchema = z.object({
 })
 
 export default async (app: FastifyInstance) => {
-  app.get('/user/:name', async (req, res) => {
+  app.put('/user/:name', async (req, res) => {
     res.send('Hello World')
   })
 }
