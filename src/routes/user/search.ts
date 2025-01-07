@@ -1,33 +1,20 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { zodToJsonSchema } from 'zod-to-json-schema'
 
-// Defina os esquemas Zod
-const paramsSchema = z.object({
-  name: z.string().min(4, 'Name must have at least 4 characters'),
+const bodySchema = z.object({
+  name: z
+    .string()
+    .min(4, 'Name must have at least 4 characters')
+    .max(15, 'The name is too big, it must have up to 15 characters')
+    .regex(RegExp('^[A-Za-z]+$'), 'Name must contain only letters'),
+  password: z
+    .string()
+    .min(8, 'Password must have at least 4 characters')
+    .max(15, 'The password is too big, it must have up to 15 characters'),
 })
 
-const responseSchema = z.string()
-
-// Converta Zod para JSON Schema
-const paramsJsonSchema = zodToJsonSchema(paramsSchema)
-const responseJsonSchema = zodToJsonSchema(responseSchema)
-
 export default async (app: FastifyInstance) => {
-  // Define o tipo do provider
-  app
-    .withTypeProvider()
-    .get<{ Params: z.infer<typeof paramsSchema> }>('/user/:name', {
-      schema: {
-        params: paramsJsonSchema,
-        response: {
-          200: responseJsonSchema,
-        },
-      },
-      handler: (req, res) => {
-        // O TypeScript agora sabe que req.params é do tipo correto
-        const { name } = req.params
-        res.send(name)
-      },
-    })
+  app.get('/user/:name', async (req, res) => {
+    res.send('Hello World')
+  })
 }
