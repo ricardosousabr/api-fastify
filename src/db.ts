@@ -1,18 +1,20 @@
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
+import { MongoClient, Db, Collection } from 'mongodb'
 
-dotenv.config()
+const uri = 'mongodb://localhost:27017/'
+const client = new MongoClient(uri)
 
-const mongoUri = 'mongodb://localhost:27017/'
+let db: Db
 
-// Função para conectar ao MongoDB
-export default async function connectToDatabase() {
-  mongoose
-    .connect(mongoUri)
-    .then(() => {
-      console.log('Conectado ao MongoDB Atlas')
-    })
-    .catch((error) => {
-      console.error('Erro ao conectar ao MongoDB:', error)
-    })
+export async function connectToDatabase() {
+  if (!db) {
+    await client.connect()
+    db = client.db('to-do-list-fastify') // Nome do banco
+    console.log('Connected to MongoDB')
+  }
+  return db
+}
+
+export async function getUsersCollection(): Promise<Collection> {
+  const database = await connectToDatabase()
+  return database.collection('users') // Nome da coleção
 }
