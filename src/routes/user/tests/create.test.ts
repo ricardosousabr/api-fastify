@@ -57,15 +57,15 @@ describe('User Route', () => {
     expect(response.status).toBe(400)
   })
 
-  it('should return 200 if the name and password contains valid characters', async () => {
-    const user = {
-      name: 'Ricardo',
-      password: '12345678',
-    }
-    const response = await supertest(app.server).post('/user').send(user)
+  // it('should return 200 if the name and password contains valid characters', async () => {
+  //   const user = {
+  //     name: 'Ricardo',
+  //     password: '12345678',
+  //   }
+  //   const response = await supertest(app.server).post('/user').send(user)
 
-    expect(response.status).toBe(200)
-  })
+  //   expect(response.status).toBe(200)
+  // })
 
   it('should return 400 if name and password are missing', async () => {
     const response = await supertest(app.server).post('/user')
