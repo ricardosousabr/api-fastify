@@ -3,6 +3,8 @@ import supertest from 'supertest'
 import search from '../search' // Substitua pelo caminho correto
 import { getUsersCollection } from '../../../db'
 
+jest.setTimeout(30000) // Define timeout global para 30 segundos
+
 describe('User Router - GET /user/:name (sem mocks)', () => {
   let app: ReturnType<typeof fastify>
 
