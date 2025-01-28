@@ -69,53 +69,40 @@ import supertest from 'supertest'
 import search from '../search' // Ajuste o caminho conforme necessário
 import { getUsersCollection } from '../../../db'
 
-jest.setTimeout(60000) // Timeout global de 60 segundos para ambientes mais lentos
+// Mock da função getUsersCollection
+jest.mock('../../../db', () => ({
+  getUsersCollection: jest.fn(),
+}))
 
-describe('User Router - GET /user/:name (sem mocks)', () => {
+describe('User Router - GET /user/:name (com mocks)', () => {
   let app: ReturnType<typeof fastify>
 
   beforeAll(async () => {
-    console.log('Iniciando Fastify...')
     app = fastify()
-
-    console.log('Registrando rotas...')
-    await app.register(search)
-
-    console.log('Preparando a aplicação...')
+    await app.register(search) // Registra a rota
     await app.ready()
-
-    console.log('Inserindo dados de teste no banco...')
-    const usersCollection = await getUsersCollection()
-    await usersCollection.insertMany([
-      { name: 'JohnDoe' },
-      { name: 'JaneSmith' },
-    ])
-    console.log('Dados de teste inseridos.')
   })
 
   afterAll(async () => {
-    console.log('Limpando dados de teste...')
-    const usersCollection = await getUsersCollection()
-    await usersCollection.deleteMany({}) // Remove todos os documentos
-
-    console.log('Fechando a aplicação...')
     await app.close()
-    console.log('Aplicação fechada.')
   })
 
   it('should return 200 and the user if the name is valid', async () => {
-    console.log('Testando busca de usuário válido...')
+    // Simula o retorno da função getUsersCollection
+    const mockCollection = {
+      findOne: jest.fn().mockResolvedValue({ _id: '1', name: 'JohnDoe' }),
+    }
+    ;(getUsersCollection as jest.Mock).mockResolvedValue(mockCollection)
+
     const response = await supertest(app.server).get('/user/JohnDoe')
 
     expect(response.status).toBe(200)
     expect(response.body.message).toBe('User retrieved successfully')
     expect(response.body.user).toMatchObject({ name: 'JohnDoe' })
     expect(response.body.user).toHaveProperty('_id')
-    console.log('Teste concluído com sucesso para usuário válido.')
   })
 
   it('should return 400 if the name is invalid', async () => {
-    console.log('Testando busca com nome inválido...')
     const response = await supertest(app.server).get('/user/jd')
 
     expect(response.status).toBe(400)
@@ -127,17 +114,20 @@ describe('User Router - GET /user/:name (sem mocks)', () => {
         },
       ],
     })
-    console.log('Teste concluído com sucesso para nome inválido.')
   })
 
   it('should return 404 if the user is not found', async () => {
-    console.log('Testando busca de usuário inexistente...')
+    // Simula o retorno vazio da função getUsersCollection
+    const mockCollection = {
+      findOne: jest.fn().mockResolvedValue(null),
+    }
+    ;(getUsersCollection as jest.Mock).mockResolvedValue(mockCollection)
+
     const response = await supertest(app.server).get('/user/NotFoundUser')
 
     expect(response.status).toBe(404)
     expect(response.body).toEqual({
       error: 'User with name "NotFoundUser" not found',
     })
-    console.log('Teste concluído com sucesso para usuário inexistente.')
   })
 })
