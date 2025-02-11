@@ -2,7 +2,6 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { getUsersCollection } from '../../db'
 
-// Esquema Zod para validação do parâmetro
 const paramsSchema = z.object({
   name: z
     .string()
@@ -12,40 +11,42 @@ const paramsSchema = z.object({
 })
 
 export default async (app: FastifyInstance) => {
-  app.delete('/user/:name', async (req, res) => {
-    // Valida os parâmetros da URL
-    const parseResult = paramsSchema.safeParse(req.params)
-    if (!parseResult.success) {
-      return res.status(400).send({
-        error: parseResult.error.errors.map((err) => ({
-          path: err.path.join('.'),
-          message: err.message,
-        })),
-      })
-    }
-
-    const { name } = parseResult.data // Nome validado pelo Zod
-
-    try {
-      const usersCollection = await getUsersCollection()
-
-      // Deleta todos os documentos que correspondem ao nome
-      const deleteResult = await usersCollection.deleteMany({ name })
-
-      if (deleteResult.deletedCount === 0) {
-        return res.status(404).send({
-          error: `No users found with the name "${name}"`,
+  app.delete(
+    '/user/:name',
+    { preHandler: [app.authenticate] },
+    async (req, res) => {
+      const parseResult = paramsSchema.safeParse(req.params)
+      if (!parseResult.success) {
+        return res.status(400).send({
+          error: parseResult.error.errors.map((err) => ({
+            path: err.path.join('.'),
+            message: err.message,
+          })),
         })
       }
 
-      res.send({
-        message: `${deleteResult.deletedCount} user(s) deleted successfully`,
-      })
-    } catch (error) {
-      console.error('Error deleting user:', error)
-      res.status(500).send({
-        error: 'Internal server error',
-      })
+      const { name } = parseResult.data
+
+      try {
+        const usersCollection = await getUsersCollection()
+
+        const deleteResult = await usersCollection.deleteMany({ name })
+
+        if (deleteResult.deletedCount === 0) {
+          return res.status(404).send({
+            error: `No users found with the name "${name}"`,
+          })
+        }
+
+        res.send({
+          message: `${deleteResult.deletedCount} user(s) deleted successfully`,
+        })
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        res.status(500).send({
+          error: 'Internal server error',
+        })
+      }
     }
-  })
+  )
 }
