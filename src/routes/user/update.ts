@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { getUsersCollection } from '../../db'
+import bcrypt from 'bcrypt'
 
-// Esquema Zod para validação
 const bodySchema = z.object({
   name: z
     .string()
@@ -16,8 +16,7 @@ const bodySchema = z.object({
 })
 
 export default async (app: FastifyInstance) => {
-  app.put('/user', async (req, res) => {
-    // Valida o corpo da requisição
+  app.put('/user', { preHandler: [app.authenticate] }, async (req, res) => {
     const validation = bodySchema.safeParse(req.body)
     if (!validation.success) {
       return res.status(400).send({
@@ -33,21 +32,28 @@ export default async (app: FastifyInstance) => {
     try {
       const usersCollection = await getUsersCollection()
 
-      // Atualiza o documento correspondente no banco
-      const updateResult = await usersCollection.updateOne(
-        { name }, // Condição para encontrar o documento
-        { $set: { password } } // Atualização dos dados
-      )
-
-      if (updateResult.matchedCount === 0) {
+      const existingUser = await usersCollection.findOne({ name })
+      if (!existingUser) {
         return res.status(404).send({
           error: `No user found with the name "${name}"`,
         })
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      const updateResult = await usersCollection.updateOne(
+        { name },
+        { $set: { password: hashedPassword } }
+      )
+
+      if (updateResult.modifiedCount === 0) {
+        return res.status(200).send({
+          message: `No changes made to user "${name}"`,
+        })
+      }
+
       res.send({
         message: `User "${name}" updated successfully`,
-        updatedFields: { name, password },
       })
     } catch (error) {
       console.error('Error updating user:', error)
