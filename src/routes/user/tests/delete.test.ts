@@ -9,7 +9,6 @@ describe('User Router - DELETE /user/:name', () => {
   beforeAll(async () => {
     app = fastify()
 
-    // 🔹 Registra a rota sem autenticação
     await app.register(
       (instance: FastifyInstance, _: any, done: () => void) => {
         instance.route({
@@ -49,7 +48,6 @@ describe('User Router - DELETE /user/:name', () => {
 
     await app.ready()
 
-    // Mock da função getUsersCollection
     jest.spyOn(db, 'getUsersCollection').mockResolvedValue({
       deleteMany: jest.fn((filter) => {
         const initialLength = mockDatabase.length
