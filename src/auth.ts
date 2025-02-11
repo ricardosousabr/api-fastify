@@ -4,7 +4,7 @@ const authPlugin: FastifyPluginCallback = (fastify, options, done) => {
   fastify.decorate('authenticate', async function (request, reply) {
     try {
       await request.jwtVerify()
-      request.user = request.user // Garante que o usuário esteja disponível
+      request.user = request.user
     } catch {
       reply.code(401).send({ error: 'Unauthorized' })
     }

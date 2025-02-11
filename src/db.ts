@@ -8,7 +8,7 @@ let db: Db
 export async function connectToDatabase() {
   if (!db) {
     await client.connect()
-    db = client.db('to-do-list-fastify') // Nome do banco
+    db = client.db('to-do-list-fastify')
     console.log('Connected to MongoDB')
   }
   return db
@@ -16,5 +16,5 @@ export async function connectToDatabase() {
 
 export async function getUsersCollection(): Promise<Collection> {
   const database = await connectToDatabase()
-  return database.collection('users') // Nome da coleção
+  return database.collection('users')
 }
