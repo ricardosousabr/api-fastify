@@ -2,6 +2,8 @@ import Fastify, { FastifyInstance } from 'fastify'
 import fastifyJwt from '@fastify/jwt'
 import dotenv from 'dotenv'
 import routes from './routes/index'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 
 dotenv.config()
 
@@ -17,6 +19,31 @@ fastify.decorate('authenticate', async function (request, reply) {
   } catch {
     reply.code(401).send({ error: 'Unauthorized' })
   }
+})
+
+fastify.register(fastifySwagger, {
+  swagger: {
+    info: {
+      title: 'API Documentation',
+      description: 'API documentation using Swagger',
+      version: '1.0.0',
+    },
+    host: `localhost:${process.env.PORT || 3000}`,
+    schemes: ['http'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    securityDefinitions: {
+      bearerAuth: {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+      },
+    },
+  },
+})
+
+fastify.register(fastifySwaggerUi, {
+  routePrefix: '/docs',
 })
 
 fastify.register(routes)
