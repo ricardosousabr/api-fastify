@@ -13,7 +13,72 @@ const paramsSchema = z.object({
 export default async (app: FastifyInstance) => {
   app.get(
     '/user/:name',
-    { preHandler: [app.authenticate] },
+    {
+      schema: {
+        tags: ['User'],
+        description: 'Retrieve a user by name',
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: 'Name of the user (4-15 letters)',
+            },
+          },
+          required: ['name'],
+        },
+        response: {
+          200: {
+            description: 'User found',
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+              user: {
+                type: 'object',
+                properties: {
+                  _id: { type: 'string' },
+                  name: { type: 'string' },
+                  createdAt: { type: 'string', format: 'date-time' },
+                  // Adicione outros campos retornados do seu documento
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Invalid name param',
+            type: 'object',
+            properties: {
+              error: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    path: { type: 'string' },
+                    message: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'User not found',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+          500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+      preHandler: [app.authenticate], // Middleware de autenticação
+    },
     async (req, res) => {
       const parseResult = paramsSchema.safeParse(req.params)
       if (!parseResult.success) {
@@ -25,14 +90,14 @@ export default async (app: FastifyInstance) => {
         })
       }
 
-      const { name } = parseResult.data // Nome validado pelo Zod
+      const { name } = parseResult.data
 
       try {
         const usersCollection = await getUsersCollection()
 
         const user = await usersCollection.findOne(
-          { name }, // Filtro pelo campo `name`
-          { projection: { password: 0 } } // Exclui o campo `password` do resultado
+          { name },
+          { projection: { password: 0 } } // Exclui o campo `password`
         )
 
         if (!user) {
