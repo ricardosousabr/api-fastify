@@ -13,7 +13,65 @@ const paramsSchema = z.object({
 export default async (app: FastifyInstance) => {
   app.delete(
     '/user/:name',
-    { preHandler: [app.authenticate] },
+    {
+      preHandler: [app.authenticate],
+      schema: {
+        tags: ['User'],
+        description: 'Delete a user by name',
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: 'Name of the user (4-15 letters)',
+              minLength: 4,
+              maxLength: 15,
+            },
+          },
+          required: ['name'],
+        },
+        response: {
+          200: {
+            description: 'User(s) deleted successfully',
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+          400: {
+            description: 'Invalid parameters',
+            type: 'object',
+            properties: {
+              error: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    path: { type: 'string' },
+                    message: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'User not found',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+          500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
     async (req, res) => {
       const parseResult = paramsSchema.safeParse(req.params)
       if (!parseResult.success) {
