@@ -13,24 +13,11 @@ I used these technologies to create this API.
 5. Jest
 6. Husky
 
-## Instalação
+## Initialize
 
-1. Start by cloning the repository:
+Use this command to start the project:
 
-   ```bash
-   git clone "repository name"
-
-   ```
-
-2. Install dependencies
-
-   ```bash
-   yarn install
-
-   ou
-
-   yarn i
-   ```
+    yarn dev
 
 ## Initialize
 
@@ -38,7 +25,14 @@ Use this command to start the project:
 
     yarn dev
 
-# API documentation
+## Tests
+
+To start the tests with the command below
+
+    yarn test
+
+
+## API documentation
 
 API documentation is available in the Swagger UI. Click on the link below to access:
 
